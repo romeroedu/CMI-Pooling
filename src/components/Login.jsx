@@ -20,8 +20,8 @@ const Login = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
+    <div className="flex flex-col items-center justify-center h-auto m-64 ">
+      <div className="w-full max-w-md p-6 space-y-6 bg-gray-200 rounded-lg shadow-md">
         <div className="flex items-center justify-center mb-6">
           <img src="./cummins_logo.png" alt="Logo" className="h-12" />
           <h2 className="px-5 text-center text-3xl font-bold text-black">CMI Pooling</h2>
