@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { auth } from '../config/firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { auth } from "../config/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = (e) => {
@@ -13,22 +13,52 @@ const Login = () => {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log(userCredential);
-        navigate('/dashboard');  // Redirects user to the Dashboard page after successful login
-      }).catch((error) => {
+        navigate("/dashboard"); // Redirects user to the Dashboard page after successful login
+      })
+      .catch((error) => {
         console.log(error);
       });
   };
 
+  const Header = ({ heading, paragraph, linkName, linkUrl }) => (
+    <div className="mb-10">
+      <div className="flex justify-center">
+        <img
+          alt="Cummins Logo"
+          className="h-14 w-14"
+          src="./cummins_logo.png"
+        />
+      </div>
+      <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        {heading}
+      </h2>
+      <p className="mt-2 text-center text-sm text-gray-600">
+        {paragraph}{" "}
+        <a
+          href={linkUrl}
+          className="font-medium text-red-600 hover:text-red-500"
+        >
+          {linkName}
+        </a>
+      </p>
+    </div>
+  );
+
   return (
-    <div className="flex flex-col items-center justify-center h-auto m-64 ">
+    <div className="flex flex-col items-center justify-center h-auto m-64">
       <div className="w-full max-w-md p-6 space-y-6 bg-gray-200 rounded-lg shadow-md">
-        <div className="flex items-center justify-center mb-6">
-          <img src="./cummins_logo.png" alt="Logo" className="h-12" />
-          <h2 className="px-5 text-center text-3xl font-bold text-black">CMI Pooling</h2>
-        </div>
+        <Header
+          heading="CMI Pooling Login"
+          paragraph="New User?"
+          linkName="Signup Here"
+          linkUrl="/signup"
+        />
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-black" htmlFor="username">
+            <label
+              className="block text-sm font-medium text-black"
+              htmlFor="username"
+            >
               Cummins Username
             </label>
             <input
@@ -41,7 +71,10 @@ const Login = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-black" htmlFor="password">
+            <label
+              className="block text-sm font-medium text-black"
+              htmlFor="password"
+            >
               Cummins Password
             </label>
             <input
@@ -63,4 +96,3 @@ const Login = () => {
 };
 
 export default Login;
-
