@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from '../config/firebase';
@@ -55,8 +54,8 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-auto m-64">
-      <div className="w-full max-w-md p-6 space-y-6 bg-gray-200 rounded-lg shadow-md">
+    <div className="flex flex-col items-center justify-center min-h-screen px-4 py-12 bg-gray-100 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md p-6 space-y-6 bg-white rounded-lg shadow-md">
         <Header
           heading="CMI Pooling Signup"
           paragraph="Already have an account?"
