@@ -17,7 +17,7 @@ function App() {
     <div className="flex flex-col min-h-screen">
       <Router>
         <Navbar />
-        <div className="flex-grow">
+        <div className="flex-grow flex flex-col">
           <Routes>
             <Route index element={<Login />} />
             <Route path="/dashboard" element={<Dashboard />} />
@@ -33,3 +33,4 @@ function App() {
 }
 
 export default App;
+

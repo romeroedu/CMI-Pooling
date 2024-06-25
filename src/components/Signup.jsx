@@ -65,7 +65,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-4 py-12 bg-gray-100 sm:px-6 lg:px-8">
+    <div className="flex flex-col items-center justify-center flex-grow bg-gray-100">
       <div className="w-full max-w-2xl p-6 space-y-6 bg-white rounded-lg shadow-md">
         <Header
           heading="CMI Pooling Signup"

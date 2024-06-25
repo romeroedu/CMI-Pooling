@@ -21,7 +21,7 @@ const Login = () => {
     };
 
     const Header = ({ heading, paragraph, linkName, linkUrl }) => (
-        <div className="mb-10">
+        <div className="mb-6">
             <div className="flex justify-center">
                 <img alt="Cummins Logo" className="h-14 w-14" src="./cummins_logo.png" />
             </div>
@@ -38,7 +38,7 @@ const Login = () => {
     );
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+        <div className="flex flex-col items-center justify-center flex-grow bg-gray-100">
             <div className="w-full max-w-md p-6 space-y-6 bg-white rounded-lg shadow-md">
                 <Header
                     heading="CMI Pooling Login"

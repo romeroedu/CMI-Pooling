@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { auth, db } from '../config/firebase';
+import { updateDoc, doc } from 'firebase/firestore';
 
 const Header = () => (
   <div className="mb-10">
@@ -12,59 +14,75 @@ const Header = () => (
   </div>
 );
 
+const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const times = Array.from({ length: 17 }, (_, i) => {
+  const hour = i + 5; // 5am to 9pm
+  const label = `${hour % 12 || 12}${hour >= 12 ? "pm" : "am"}`;
+  return { value: hour, label };
+});
+const locations = ["Location A", "Location B", "Location C"];
+
 const AvailabilityPage = () => {
   const [carAvailable, setCarAvailable] = useState(false);
   const [schedule, setSchedule] = useState(
-    Array(7).fill({ location: "", go: "", return: "" })
+    days.reduce((acc, day) => {
+      acc[day] = { location: "", go: "", return: "", timeSlots: Array(17).fill(false) };
+      return acc;
+    }, {})
   );
   const [errors, setErrors] = useState([]);
   const navigate = useNavigate();
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  const times = Array.from({ length: 17 }, (_, i) => {
-    const hour = i + 5; // 5am to 9pm
-    const label = `${hour % 12 || 12}${hour >= 12 ? "pm" : "am"}`;
-    return { value: hour, label };
-  });
-  const locations = ["Location A", "Location B", "Location C"];
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
     let validationErrors = [];
-    schedule.forEach((time, index) => {
-      if (time.location && (!time.go || !time.return)) {
-        validationErrors.push(
-          `Please select both go and return times for ${days[index]}.`
-        );
+    Object.keys(schedule).forEach(day => {
+      if (schedule[day].location && (!schedule[day].go || !schedule[day].return)) {
+        validationErrors.push(`Please select both go and return times for ${day}.`);
       }
     });
     if (validationErrors.length > 0) {
       setErrors(validationErrors);
     } else {
-      // Handle saving the availability
-      console.log("Saving availability", schedule);
-      setErrors([]);
+      const user = auth.currentUser;
+      const userRef = doc(db, "users", user.uid);
+      try {
+        await updateDoc(userRef, {
+          haveCar: carAvailable,
+          schedule: carAvailable ? schedule : null,
+        });
+        console.log("Availability saved");
+        setErrors([]);
+        navigate('/dashboard');
+      } catch (error) {
+        console.error("Error saving availability: ", error);
+        setErrors([error.message]);
+      }
     }
   };
 
-  const handleTimeChange = (dayIndex, type, value) => {
-    const updatedSchedule = schedule.map((time, index) =>
-      index === dayIndex ? { ...time, [type]: value } : time
-    );
+  const handleTimeChange = (day, type, value) => {
+    const updatedSchedule = { ...schedule };
+    const goTime = type === "go" ? parseInt(value) : parseInt(updatedSchedule[day].go);
+    const returnTime = type === "return" ? parseInt(value) : parseInt(updatedSchedule[day].return);
+    
+    const newTimeSlots = Array(17).fill(false).map((_, i) => {
+      return i >= goTime && i <= returnTime;
+    });
+
+    updatedSchedule[day] = { ...updatedSchedule[day], [type]: value, timeSlots: newTimeSlots };
     setSchedule(updatedSchedule);
   };
 
-  const handleLocationChange = (dayIndex, value) => {
-    const updatedSchedule = schedule.map((time, index) =>
-      index === dayIndex
-        ? { ...time, location: value, go: "", return: "" }
-        : time
-    );
+  const handleLocationChange = (day, value) => {
+    const updatedSchedule = { ...schedule };
+    updatedSchedule[day] = { location: value, go: "", return: "", timeSlots: Array(17).fill(false) };
     setSchedule(updatedSchedule);
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-auto m-64">
-      <div className="w-full max-w-4xl p-8 space-y-8 bg-gray-200 rounded-lg shadow-md">
+    <div className="flex flex-col items-center justify-center min-h-screen px-4 py-24 bg-gray-100 sm:px-6 lg:px-8"> {/* Adjusted py-24 to add more space at the top */}
+      <div className="w-full max-w-4xl p-8 space-y-8 bg-white rounded-lg shadow-md">
         <Header />
         <form onSubmit={handleSave} className="mt-8 space-y-6">
           <div>
@@ -113,16 +131,16 @@ const AvailabilityPage = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {days.map((day, index) => (
+                    {days.map((day) => (
                       <tr key={day}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {day}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <select
-                            value={schedule[index].location}
+                            value={schedule[day].location}
                             onChange={(e) =>
-                              handleLocationChange(index, e.target.value)
+                              handleLocationChange(day, e.target.value)
                             }
                             className="form-select mt-1 block w-full"
                           >
@@ -136,12 +154,12 @@ const AvailabilityPage = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <select
-                            value={schedule[index].go}
+                            value={schedule[day].go}
                             onChange={(e) =>
-                              handleTimeChange(index, "go", e.target.value)
+                              handleTimeChange(day, "go", e.target.value)
                             }
                             className="form-select mt-1 block w-full"
-                            disabled={!schedule[index].location}
+                            disabled={!schedule[day].location}
                           >
                             <option value="">Select Time</option>
                             {times.map((time) => (
@@ -153,13 +171,13 @@ const AvailabilityPage = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <select
-                            value={schedule[index].return}
+                            value={schedule[day].return}
                             onChange={(e) =>
-                              handleTimeChange(index, "return", e.target.value)
+                              handleTimeChange(day, "return", e.target.value)
                             }
                             className="form-select mt-1 block w-full"
                             disabled={
-                              !schedule[index].location || !schedule[index].go
+                              !schedule[day].location || !schedule[day].go
                             }
                           >
                             <option value="">Select Time</option>
@@ -167,7 +185,7 @@ const AvailabilityPage = () => {
                               .filter(
                                 (time) =>
                                   parseInt(time.value) >
-                                  parseInt(schedule[index].go)
+                                  parseInt(schedule[day].go)
                               )
                               .map((time) => (
                                 <option key={time.value} value={time.value}>
