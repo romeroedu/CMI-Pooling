@@ -43,7 +43,7 @@ const Login = () => {
                 <Header
                     heading="CMI Pooling Login"
                     paragraph="New User?"
-                    linkName="Signup Here"
+                    linkName="Sign Up Here"
                     linkUrl="/signup"
                 />
                 <form onSubmit={handleLogin} className="space-y-6">
