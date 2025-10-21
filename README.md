@@ -1,5 +1,5 @@
 # Video Demo of CMI Pooling Running
-[![Watch the video](https://img.youtube.com/vi/<VIDEO_ID>/0.jpg)](https://youtu.be/qUHNxAB4hFk)
+[Watch the video](https://img.youtube.com/vi/<VIDEO_ID>/0.jpg)](https://youtu.be/qUHNxAB4hFk)
 
 # Getting Started with Create React App
 
